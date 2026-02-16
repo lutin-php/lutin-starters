@@ -26,9 +26,16 @@ const STARTERS_DIR = __DIR__ . '/../starters';
 const DIST_DIR = __DIR__ . '/../dist';
 const MANIFEST_FILE = __DIR__ . '/../starters.json';
 
-// Runtime configuration - fail if required env vars are missing
-$githubRepo = getenv('GITHUB_REPOSITORY') ?: throw new \RuntimeException('GITHUB_REPOSITORY environment variable is required');
-$releaseVersion = getenv('RELEASE_VERSION') ?: throw new \RuntimeException('RELEASE_VERSION environment variable is required');
+// Runtime configuration - fail if required env vars are missing or empty
+$githubRepo = getenv('GITHUB_REPOSITORY');
+if ($githubRepo === false || trim($githubRepo) === '') {
+    throw new \RuntimeException('GITHUB_REPOSITORY environment variable is required and must not be empty');
+}
+
+$releaseVersion = getenv('RELEASE_VERSION');
+if ($releaseVersion === false || trim($releaseVersion) === '') {
+    throw new \RuntimeException('RELEASE_VERSION environment variable is required and must not be empty');
+}
 
 /**
  * Recursively add a directory to a ZIP archive
