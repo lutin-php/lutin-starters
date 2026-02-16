@@ -27,13 +27,13 @@ const DIST_DIR = __DIR__ . '/../dist';
 const MANIFEST_FILE = __DIR__ . '/../starters.json';
 
 // Runtime configuration - fail if required env vars are missing or empty
-$githubRepo = getenv('GITHUB_REPOSITORY');
-if ($githubRepo === false || trim($githubRepo) === '') {
+$githubRepo = $_SERVER['GITHUB_REPOSITORY'] ?? $_ENV['GITHUB_REPOSITORY'] ?? null;
+if (empty($githubRepo) || trim($githubRepo) === '') {
     throw new \RuntimeException('GITHUB_REPOSITORY environment variable is required and must not be empty');
 }
 
-$releaseVersion = getenv('RELEASE_VERSION');
-if ($releaseVersion === false || trim($releaseVersion) === '') {
+$releaseVersion = $_SERVER['RELEASE_VERSION'] ?? $_ENV['RELEASE_VERSION'] ?? null;
+if (empty($releaseVersion) || trim($releaseVersion) === '') {
     throw new \RuntimeException('RELEASE_VERSION environment variable is required and must not be empty');
 }
 
