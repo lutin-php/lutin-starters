@@ -1,0 +1,124 @@
+name: Build and Release Starters
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: false
+        default: ''
+
+env:
+  PHP_VERSION: '8.1'
+
+jobs:
+  build:
+    name: Build Starter Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: zip
+
+      - name: Generate version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $VERSION"
+
+      - name: Run build script
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          php scripts/build-zips.php
+
+      - name: Update manifest with release URLs
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          REPO="${{ github.repository }}"
+          sed -i "s|v{VERSION}|v${VERSION}|g" starters.json
+          sed -i "s|USER/REPO|${REPO}|g" starters.json
+          cat starters.json
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: starter-packages
+          path: dist/*.zip
+          retention-days: 7
+
+      - name: Commit updated starters.json
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add starters.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update starters.json for v${{ steps.version.outputs.version }}"
+            git push
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          body: |
+            ## Lutin.php Starter Templates
+            
+            This release contains the following starter packages:
+            
+            ${{ steps.list_starters.outputs.starters_list }}
+            
+            ### Installation
+            
+            Download the starter package you want and extract it to your project directory.
+            
+            ### Verification
+            
+            All packages include SHA-256 hashes for verification. See `starters.json` for hash values.
+          files: dist/*.zip
+          generate_release_notes: false
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update manifest with actual release URLs
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          REPO="${{ github.repository }}"
+          # Replace {VERSION} placeholder with actual version in download URLs
+          sed -i "s|v{VERSION}|v${VERSION}|g" starters.json
+          cat starters.json
+
+      - name: Commit final starters.json
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add starters.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update starters.json with release URLs for v${{ steps.version.outputs.version }}"
+            git push
+          fi
