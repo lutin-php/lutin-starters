@@ -1,5 +1,15 @@
 {
-    "version": "1.0.0",
-    "generated_at": "",
-    "starters": []
+    "version": null,
+    "generated_at": "2026-02-16T11:56:06+00:00",
+    "starters": [
+        {
+            "id": "blog-static",
+            "name": "Minimal Static Blog Starter",
+            "description": "A simple flat-file blog with a public/private structure designed for the Lutin.php ecosystem.",
+            "hash": "sha256-1f5f53129db6f8d020dd5eb2d60a21b8f01568d8faf4dab1c2ee3709183a9951",
+            "size": 7123,
+            "zip_name": "blog-static.zip",
+            "download_url": "https://github.com//releases/download/v/blog-static.zip"
+        }
+    ]
 }
