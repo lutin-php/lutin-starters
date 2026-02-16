@@ -2,7 +2,7 @@
 
 [![Build Releases](https://github.com/USER/REPO/actions/workflows/build-releases.yml/badge.svg)](https://github.com/USER/REPO/actions/workflows/build-releases.yml)
 
-Centralized repository for managing, building, and distributing starter templates for the [Lutin.php](https://github.com/ncarrez/lutin-php) ecosystem.
+Centralized repository for managing, building, and distributing starter templates for the [Lutin.php](https://github.com/lutin-php/lutin-php) ecosystem.
 
 ## Overview
 
@@ -156,4 +156,4 @@ MIT License — see [LICENSE](./LICENSE) for details.
 
 ## Related Projects
 
-- [Lutin.php](https://github.com/ncarrez/lutin-php) — The AI-powered PHP development environment
+- [Lutin.php](https://github.com/lutin-php/lutin-php) — The AI-powered PHP development environment
