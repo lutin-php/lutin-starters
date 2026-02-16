@@ -49,7 +49,10 @@ function addDirectoryToZip(ZipArchive $zip, string $sourcePath, string $zipPath 
 
     foreach ($iterator as $file) {
         $filePath = $file->getRealPath();
-        $relativePath = $zipPath . substr($filePath, strlen($sourcePath));
+        // Strip source path and leading slash to get relative path
+        $relativeInSource = substr($filePath, strlen($sourcePath));
+        $relativeInSource = ltrim($relativeInSource, '/\\');
+        $relativePath = $zipPath . $relativeInSource;
 
         // Normalize path separators for ZIP
         $relativePath = str_replace('\\', '/', $relativePath);
